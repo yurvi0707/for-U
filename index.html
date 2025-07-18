@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Birthday 3D Cake Surprise</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: url('https://github.com/yurvi0707/BIRTHDAY/raw/main/20250630_140107_960.jpg') no-repeat center center;
+      background-size: cover;
+      font-family: 'Comic Sans MS', cursive;
+      overflow: hidden;
+    }
+
+    .slideshow-window {
+      position: absolute;
+      top: 5%;
+      left: 5%;
+      width: 300px;
+      height: 200px;
+      border: 6px solid white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(5px);
+      z-index: 5;
+    }
+
+    .slideshow-window img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .slideshow-window img.active {
+      opacity: 1;
+    }
+
+    model-viewer {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      height: 500px;
+      z-index: 1;
+      transition: filter 0.5s ease;
+    }
+
+    .wish-button, .cut-button {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(255, 105, 180, 0.9);
+      color: white;
+      border: none;
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 10;
+      transition: background 0.3s;
+    }
+
+    .wish-button:hover, .cut-button:hover {
+      background: hotpink;
+    }
+
+    .cut-button {
+      display: none;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.4);
+      z-index: 9;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .overlay .message {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px #ff80bf;
+    }
+
+    .countdown {
+      font-size: 48px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .sparkles {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 8;
+      overflow: hidden;
+      display: none;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: sparkleAnim 1s linear forwards;
+    }
+
+    @keyframes sparkleAnim {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.5);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="slideshow-window">
+  <img src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.23.jpeg" class="active">
+  <img src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.23%20(1).jpeg">
+  <img src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.24.jpeg">
+  <img src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.22.jpeg">
+</div>
+
+<model-viewer
+  id="cakeModel"
+  src="/images/candlecakefinal.glb"
+  alt="3D Cake"
+  camera-controls
+  interaction-prompt="none"
+  disable-zoom
+  shadow-intensity="1"
+  exposure="1.2"
+  environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+  camera-orbit="0deg 75deg 2.5m"
+  field-of-view="30deg"
+></model-viewer>
+
+
+<button class="wish-button" onclick="startWish()" id="wishBtn">Make a wish and blow the candle</button>
+<button class="cut-button" id="cutBtn" onclick="cutCake()">Cut the Cake 🍰</button>
+
+<div class="overlay" id="wishOverlay">
+  <div class="message">Close your eyes, my princess...<br>and make the sweetest wish ✨💖</div>
+  <div class="countdown" id="countdown">10</div>
+</div>
+
+<div class="sparkles" id="sparkles"></div>
+<audio id="cakeMusic" src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/happy%20birthday%20to%20you.mp3" preload="auto"></audio>
+
+<script>
+  const slides = document.querySelectorAll(".slideshow-window img");
+  let slideIndex = 0;
+  setInterval(() => {
+    slides[slideIndex].classList.remove('active');
+    slideIndex = (slideIndex + 1) % slides.length;
+    slides[slideIndex].classList.add('active');
+  }, 3000);
+
+  function startWish() {
+    const overlay = document.getElementById('wishOverlay');
+    const countdownText = document.getElementById('countdown');
+    const model = document.getElementById('cakeModel');
+    const sparkles = document.getElementById('sparkles');
+    const wishBtn = document.getElementById('wishBtn');
+    const music = document.getElementById('cakeMusic');
+
+    // Show overlay and sparkles
+    overlay.style.display = 'flex';
+    sparkles.style.display = 'block';
+    model.style.filter = 'blur(5px)';
+    wishBtn.style.display = 'none';
+
+    // 💫 Change GLB immediately
+    model.setAttribute('src', '/images/demo1.glb');
+model.setAttribute('autoplay', true);
+model.setAttribute('animation-name', '');
+
+
+    // Sparkle effect on top
+    const sparkleInterval = setInterval(() => {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = Math.random() * window.innerWidth + 'px';
+      sparkle.style.top = Math.random() * window.innerHeight + 'px';
+      sparkle.style.background = `hsl(${Math.random() * 360}, 100%, 80%)`;
+      document.body.appendChild(sparkle); // Make sure sparkles are on top
+      setTimeout(() => sparkle.remove(), 1000);
+    }, 100);
+
+    // Countdown
+    let seconds = 10;
+    countdownText.textContent = seconds;
+    const countdown = setInterval(() => {
+      seconds--;
+      countdownText.textContent = seconds;
+
+      if (seconds === 0) {
+        clearInterval(countdown);
+        clearInterval(sparkleInterval);
+        overlay.style.display = 'none';
+        sparkles.style.display = 'none';
+        model.style.filter = 'none';
+
+        // 🎵 Play music
+        music.volume = 0;
+music.play().then(() => {
+  let vol = 0;
+  const fadeIn = setInterval(() => {
+    if (vol < 1) {
+      vol += 0.05;
+      music.volume = vol;
+    } else {
+      clearInterval(fadeIn);
+    }
+  }, 200);
+});
+;
+
+        // 💐 Show Bouquet button after 15s
+        setTimeout(() => {
+          const bouquetBtn = document.createElement('button');
+          bouquetBtn.textContent = "Bouquet for You 💐";
+          bouquetBtn.className = "wish-button";
+          bouquetBtn.style.bottom = "30px";
+          bouquetBtn.style.right = "30px";
+          bouquetBtn.onclick = () => {
+            window.location.href = "butterfly.html";
+          };
+          document.body.appendChild(bouquetBtn);
+        }, 15000);
+      }
+    }, 1000);
+  }
+</script>
+
+
+</body>
+</html>

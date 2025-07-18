@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Butterfly Surprise</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+   body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background: url('https://github.com/yurvi0707/BIRTHDAY/raw/main/images%20(7).jpeg') no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+}
+
+
+    #shakeBtn {
+      margin: 20px;
+      padding: 12px 24px;
+      font-size: 20px;
+      background: #ff69b4;
+      border: none;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+      z-index: 10;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    model-viewer.shake {
+      animation: shake 1s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      50% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+
+    .butterfly {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: flyOut 9s ease-in-out forwards;
+    }
+
+    @keyframes flyOut {
+      0% {
+        transform: translate(-50%, -50%) translate3d(0, 0, 0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) translate3d(var(--x), var(--y), 0) rotate(360deg);
+        opacity: 1;
+      }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      opacity: 0.9;
+      animation: sparkleAnim 0.8s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes sparkleAnim {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .scroll-popup {
+      background: url('https://github.com/yurvi0707/BIRTHDAY/raw/main/11c233ffad756a4a01a7dafaff38b7b9.png') center/cover no-repeat;
+      padding: 40px 30px;
+      border-radius: 30px;
+      box-shadow: 0 0 35px #caa76b;
+      font-family: 'Papyrus', cursive;
+      color: #4e3b1f;
+      font-size: 20px;
+      width: 370px;
+      height: 520px;
+      overflow-y: auto;
+      position: relative;
+      animation: unroll 1s ease-out forwards;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes unroll {
+      0% { transform: scaleY(0.1); opacity: 0; }
+      100% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .scroll-text {
+      white-space: pre-wrap;
+      visibility: hidden;
+      text-align: center;
+      line-height: 1.6;
+      position: relative;
+      z-index: 5;
+    }
+
+    .feather {
+      position: absolute;
+      width: 50px;
+      height: auto;
+      right: 30px;
+      bottom: 30px;
+      opacity: 1;
+      transform: rotate(-20deg);
+      animation: featherFloat 2s ease-in-out infinite alternate;
+      z-index: 10;
+    }
+
+    @keyframes featherFloat {
+      0% { transform: translateY(0) rotate(-20deg); }
+      100% { transform: translateY(-8px) rotate(0deg); }
+    }
+
+    .popup-image {
+      background: none;
+    }
+
+    .popup-image img {
+      width: 250px;
+      height: auto;
+      border-radius: 10px;
+      animation: flyPigeon 1.2s ease-out forwards;
+    }
+
+    @keyframes flyPigeon {
+      0% {
+        opacity: 0;
+        transform: translate(var(--fromX), var(--fromY)) rotate(0deg) scale(0.2);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(360deg) scale(1);
+      }
+    }
+
+    .heart-popup {
+      font-size: 100px;
+      color: red;
+      animation: popHeart 1.5s ease-out forwards;
+    }
+
+    @keyframes popHeart {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    #muteBtn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      font-size: 18px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.8);
+      cursor: pointer;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+<model-viewer id="model" src="/images/bouquet_with_letters.glb"
+  alt="Bouquet Model"
+  auto-rotate
+  camera-controls
+  ar
+  style="width: 600px; height: 600px;">
+</model-viewer>
+
+<button id="shakeBtn">SHAKE AND CATCH THEM 😍</button>
+<button id="muteBtn">🔊</button>
+
+<audio id="flutterSound" src="https://github.com/yurvi0707/BIRTHDAY/raw/main/WhatsApp%20Audio%202025-07-18%20at%2011.00.05.mpeg" preload="auto"></audio>
+<audio id="shakeSound" src="sounds/shake.mp3" preload="auto"></audio>
+<audio id="bgMusic" src="https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/Butterfly%20Echoes%20(1).mp3" preload="auto" loop></audio>
+
+<script>
+  const model = document.getElementById('model');
+  const btn = document.getElementById('shakeBtn');
+  const flutterSound = document.getElementById('flutterSound');
+  const shakeSound = document.getElementById('shakeSound');
+  const bgMusic = document.getElementById('bgMusic');
+  const muteBtn = document.getElementById('muteBtn');
+  const totalButterflies = 10;
+
+  // 🎵 Fade-in Music on first click
+  window.addEventListener('click', () => {
+    if (bgMusic.paused) {
+      bgMusic.volume = 0;
+      bgMusic.play().then(() => {
+        let vol = 0;
+        const fadeIn = setInterval(() => {
+          if (vol < 1) {
+            vol += 0.05;
+            bgMusic.volume = vol;
+          } else {
+            clearInterval(fadeIn);
+          }
+        }, 200);
+      }).catch(e => console.warn('Autoplay blocked:', e));
+    }
+  }, { once: true });
+
+  // 🔇 Mute/Unmute toggle
+  muteBtn.onclick = () => {
+    bgMusic.muted = !bgMusic.muted;
+    muteBtn.textContent = bgMusic.muted ? '🔇' : '🔊';
+  };
+
+  const messages = [
+    '🦋 This butterfly carries a breeze of love...',
+    '🌬️ Flew too fast to leave a message...',
+    '✨ Try again… not every flight brings a gift.'
+  ];
+
+  const letters = [
+    'Hey Love,\n\nThis moment with you is everything. You bring light to my dullest days and joy to my heart. I cherish you more each day. ❤️\n\nForever Yours,',
+    'My Darling,\n\nEach petal that falls reminds me of your touch. You\'re the poem my heart writes each day. 💌\n\nYours forever,'
+  ];
+
+  const images = [
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.24%20(1).jpeg',
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.24.jpeg',
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.25%20(1).jpeg',
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.25%20(2).jpeg',
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.21.jpeg',
+    'https://raw.githubusercontent.com/yurvi0707/BIRTHDAY/main/WhatsApp%20Image%202025-06-30%20at%2022.29.25.jpeg'
+  ];
+
+  const butterflyModels = ['/images/animated_butterfly.glb', '/images/butterflies.glb'];
+
+  function createSparkle(x, y) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    const colors = ['#ff69b4', '#ff0', '#0ff', '#0f0', '#f0f', '#f00'];
+    sparkle.style.background = `radial-gradient(circle, white, ${colors[Math.floor(Math.random() * colors.length)]})`;
+    sparkle.style.left = `${x}px`;
+    sparkle.style.top = `${y}px`;
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 800);
+  }
+
+  btn.addEventListener('click', () => {
+    model.classList.add('shake');
+    shakeSound.currentTime = 0;
+    shakeSound.play();
+    setTimeout(() => model.classList.remove('shake'), 1000);
+
+    for (let i = 0; i < totalButterflies; i++) {
+      setTimeout(() => {
+        flutterSound.currentTime = 0;
+        flutterSound.play();
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'butterfly';
+
+        const randomX = (Math.random() * 200 - 100) + 'vw';
+        const randomY = (Math.random() * 200 - 100) + 'vh';
+        wrapper.style.setProperty('--x', randomX);
+        wrapper.style.setProperty('--y', randomY);
+
+        const selectedModel = butterflyModels[i % butterflyModels.length];
+
+        const butterflyModel = document.createElement('model-viewer');
+        butterflyModel.src = selectedModel;
+        butterflyModel.alt = 'Flying Butterfly';
+        butterflyModel.autoplay = true;
+        butterflyModel.autoRotate = true;
+        butterflyModel.style.width = '100%';
+        butterflyModel.style.height = '100%';
+        butterflyModel.setAttribute('disable-zoom', '');
+        butterflyModel.setAttribute('interaction-prompt', 'none');
+
+        wrapper.appendChild(butterflyModel);
+
+        wrapper.onclick = () => {
+          const rand = Math.random();
+          let content = '';
+
+          if (rand < 0.2) {
+            content = `<div class='popup-content heart-popup'>💖</div>`;
+          } else if (rand < 0.6) {
+            const messageType = rand < 0.4 ? messages : letters;
+            content = `
+              <div class='scroll-popup'>
+                <div class='scroll-text' id='scrollText'></div>
+                <img src='https://github.com/yurvi0707/BIRTHDAY/raw/main/%E2%80%94Pngtree%E2%80%94golden%20feather%20pen%20clipart%20on_17736980.png' class='feather' id='feather' />
+              </div>
+            `;
+          } else {
+            const img = images[Math.floor(Math.random() * images.length)];
+            const flyFromX = `${Math.random() > 0.5 ? '-' : ''}${Math.floor(Math.random() * 300 + 150)}px`;
+            const flyFromY = `${Math.random() > 0.5 ? '-' : ''}${Math.floor(Math.random() * 300 + 150)}px`;
+
+            content = `<div class='popup-image'>
+              <img src='${img}' style='--fromX: ${flyFromX}; --fromY: ${flyFromY};'>
+            </div>`;
+          }
+
+          const popup = document.createElement('div');
+          popup.className = 'popup';
+          popup.innerHTML = content;
+          popup.onclick = () => popup.remove();
+          document.body.appendChild(popup);
+
+          const scrollText = popup.querySelector('#scrollText');
+          const feather = popup.querySelector('#feather');
+          if (scrollText && feather) {
+            const isMessage = rand < 0.4;
+            const fullText = isMessage
+              ? messages[Math.floor(Math.random() * messages.length)]
+              : letters[Math.floor(Math.random() * letters.length)];
+
+            scrollText.style.visibility = 'visible';
+            feather.style.opacity = 1;
+
+            const words = fullText.split(' ');
+            let index = 0;
+
+            function typeNextWord() {
+              if (index < words.length) {
+                scrollText.textContent += words[index] + ' ';
+                index++;
+                setTimeout(typeNextWord, 300);
+              } else {
+                feather.style.animation = 'none';
+                feather.style.transition = 'opacity 1s ease';
+                feather.style.opacity = 0;
+              }
+            }
+
+            setTimeout(typeNextWord, 700);
+          }
+        };
+
+        document.body.appendChild(wrapper);
+
+        const sparkleInterval = setInterval(() => {
+          const rect = wrapper.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          createSparkle(x, y);
+        }, 200);
+
+        setTimeout(() => {
+          wrapper.remove();
+          clearInterval(sparkleInterval);
+        }, 9000);
+      }, i * 300);
+    }
+  });
+</script>
+</body>
+</html>
